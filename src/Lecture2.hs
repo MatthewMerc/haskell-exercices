@@ -40,6 +40,8 @@ module Lecture2
     , constantFolding
     ) where
 
+import Data.Char (isSpace)
+import Data.List (dropWhileEnd)
 -- VVV If you need to import libraries, do it after this line ... VVV
 
 -- ^^^ and before this line. Otherwise the test suite might fail  ^^^
@@ -52,7 +54,11 @@ zero, you can stop calculating product and return 0 immediately.
 84
 -}
 lazyProduct :: [Int] -> Int
-lazyProduct = error "TODO"
+lazyProduct [] = error "oops"
+lazyProduct [0,_] = 0
+lazyProduct (x:xs)
+  | x == 0 = 0
+  | otherwise = x * head xs * lazyProduct (tail xs)
 
 {- | Implement a function that duplicates every element in the list.
 
@@ -62,11 +68,12 @@ lazyProduct = error "TODO"
 "ccaabb"
 -}
 duplicate :: [a] -> [a]
-duplicate = error "TODO"
+duplicate  = concatMap (replicate 2) 
 
 {- | Implement function that takes index and a list and removes the
 element at the given position. Additionally, this function should also
 return the removed element.
+
 
 >>> removeAt 0 [1 .. 5]
 (Just 1,[2,3,4,5])
@@ -74,7 +81,26 @@ return the removed element.
 >>> removeAt 10 [1 .. 5]
 (Nothing,[1,2,3,4,5])
 -}
-removeAt = error "TODO"
+
+-- go 0 (x: xs) acc = (Just x, acc ++ xs)
+-- go _ [] acc = (Nothing,acc) 
+-- go :: Int -> [a] -> [a] -> (Maybe a, [a])
+
+-- go 0 (x : xs) acc = (Just x, acc ++ xs)
+
+
+-- go m (x: xs) acc = go (m-1) xs acc++[x]
+
+
+removeAt :: Int -> [a] -> (Maybe a, [a])
+removeAt index elems
+  | index < 0 = (Nothing, elems)
+  | otherwise = go index elems (Nothing, [])
+  where
+    go 0 (x : xs) (_, acc) = (Just x, acc ++ xs)
+    go n (x : xs) (val, acc) = go (n - 1) xs (val, acc ++ [x])
+    go _ [] acc = acc
+
 
 {- | Write a function that takes a list of lists and returns only
 lists of even lengths.
@@ -85,7 +111,8 @@ lists of even lengths.
 ♫ NOTE: Use eta-reduction and function composition (the dot (.) operator)
   in this function.
 -}
-evenLists = error "TODO"
+evenLists :: [[a]] -> [[a]]
+evenLists = filter (even . length)
 
 {- | The @dropSpaces@ function takes a string containing a single word
 or number surrounded by spaces and removes all leading and trailing
@@ -101,7 +128,7 @@ spaces.
 
 🕯 HINT: look into Data.Char and Prelude modules for functions you may use.
 -}
-dropSpaces = error "TODO"
+dropSpaces x = dropWhile isSpace .  dropWhileEnd isSpace 
 
 {- |
 
